@@ -114,49 +114,32 @@ if __name__ == '__main__':
     parameters = Parameters()
     manager = Manager(parameters)
 
-    def format_pln(amount: float) -> str:
-        return f'{amount:,.2f} PLN'.replace(',', ' ').replace('.', ',')
+    print("=" * 50)
+    print("APARTMENTS")
+    print("=" * 50)
 
     for apartment in manager.apartments.values():
-        print(f'\n=== Mieszkanie: {apartment.name} ===')
-        print(f'Adres: {apartment.location} | Powierzchnia: {apartment.area_m2:g} m²')
+        print(f"\n[{apartment.key}] {apartment.name} — {apartment.location} ({apartment.area_m2:.0f} m2)")
 
-        print('\nPokoje:')
+        print("  Rooms:")
         for room in apartment.rooms.values():
-            print(f'  • {room.name}: {room.area_m2:g} m²')
+            print(f"    - {room.name} ({room.area_m2:.0f} m2)")
 
-        apartment_bills = [bill for bill in manager.bills if bill.apartment == apartment.key]
-        print('\nRachunki:')
-        if apartment_bills:
-            for bill in apartment_bills:
-                print(
-                    f'  • {bill.type}: {format_pln(bill.amount_pln)} | '
-                    f'termin: {bill.date_due} | '
-                    f'okres: {bill.settlement_month:02d}/{bill.settlement_year}'
-                )
-        else:
-            print('  Brak rachunków.')
+        print("  Bills:")
+        for bill in manager.bills:
+            if bill.apartment == apartment.key:
+                print(f"    - {bill.type:<10} {bill.amount_pln:>8,.2f} zł  due {bill.date_due}  [{bill.settlement_year}-{bill.settlement_month:02d}]")
 
-    print('\n=== Najemcy i wpłaty ===')
+    print("\n" + "=" * 50)
+    print("TENANTS")
+    print("=" * 50)
+
     for tenant in manager.tenants.values():
-        apartment = manager.apartments.get(tenant.apartment)
-        apartment_name = apartment.name if apartment else tenant.apartment
-        room = apartment.rooms.get(tenant.room) if apartment else None
-        room_name = room.name if room else tenant.room
-        print(f'\nNajemca: {tenant.name}')
-        print(f'  Mieszkanie: {apartment_name} | Pokój: {room_name}')
-        print(f'  Czynsz: {format_pln(tenant.rent_pln)} | Kaucja: {format_pln(tenant.deposit_pln)}')
-        print(f'  Umowa: {tenant.date_agreement_from} – {tenant.date_agreement_to}')
+        print(f"\n{tenant.name}  ->  {tenant.apartment} / {tenant.room}")
+        print(f"  Rent: {tenant.rent_pln:,.2f} zł   Deposit: {tenant.deposit_pln:,.2f} zł")
+        print(f"  Agreement: {tenant.date_agreement_from} -> {tenant.date_agreement_to}")
 
-        tenant_transfers = [transfer for transfer in manager.transfers if transfer.tenant == tenant.name]
-        if tenant_transfers:
-            print('  Wpłaty:')
-            for transfer in tenant_transfers:
-                period = (
-                    f'{transfer.settlement_month:02d}/{transfer.settlement_year}'
-                    if transfer.settlement_month is not None and transfer.settlement_year is not None
-                    else 'brak okresu'
-                )
-                print(f'    • {format_pln(transfer.amount_pln)} | data: {transfer.date} | okres: {period}')
-        else:
-            print('  Wpłaty: brak')
+        print("  Transfers:")
+        for transfer in manager.transfers:
+            if transfer.tenant == tenant.name:
+                print(f"    - {transfer.amount_pln:>8,.2f} zł  on {transfer.date}  [{transfer.settlement_year}-{transfer.settlement_month:02d}]")

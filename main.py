@@ -114,17 +114,49 @@ if __name__ == '__main__':
     parameters = Parameters()
     manager = Manager(parameters)
 
-    for apartment in manager.apartments.values():
-        print(apartment.key, apartment.name, apartment.location, apartment.area_m2)
-        for room in apartment.rooms.values():
-            print('  ', room.name, room.area_m2)
-        
-        for bill in manager.bills:
-            if bill.apartment == apartment.key:
-                print('  ', bill.amount_pln, bill.date_due, bill.settlement_year, bill.settlement_month, bill.type)
+    def format_pln(amount: float) -> str:
+        return f'{amount:,.2f} PLN'.replace(',', ' ').replace('.', ',')
 
+    for apartment in manager.apartments.values():
+        print(f'\n=== Mieszkanie: {apartment.name} ===')
+        print(f'Adres: {apartment.location} | Powierzchnia: {apartment.area_m2:g} m²')
+
+        print('\nPokoje:')
+        for room in apartment.rooms.values():
+            print(f'  • {room.name}: {room.area_m2:g} m²')
+
+        apartment_bills = [bill for bill in manager.bills if bill.apartment == apartment.key]
+        print('\nRachunki:')
+        if apartment_bills:
+            for bill in apartment_bills:
+                print(
+                    f'  • {bill.type}: {format_pln(bill.amount_pln)} | '
+                    f'termin: {bill.date_due} | '
+                    f'okres: {bill.settlement_month:02d}/{bill.settlement_year}'
+                )
+        else:
+            print('  Brak rachunków.')
+
+    print('\n=== Najemcy i wpłaty ===')
     for tenant in manager.tenants.values():
-        print(tenant.name, tenant.apartment, tenant.room, tenant.rent_pln, tenant.deposit_pln, tenant.date_agreement_from, tenant.date_agreement_to)
-        for transfer in manager.transfers:
-            if transfer.tenant == tenant.name:
-                print('  ', transfer.amount_pln, transfer.date, transfer.settlement_year, transfer.settlement_month)
+        apartment = manager.apartments.get(tenant.apartment)
+        apartment_name = apartment.name if apartment else tenant.apartment
+        room = apartment.rooms.get(tenant.room) if apartment else None
+        room_name = room.name if room else tenant.room
+        print(f'\nNajemca: {tenant.name}')
+        print(f'  Mieszkanie: {apartment_name} | Pokój: {room_name}')
+        print(f'  Czynsz: {format_pln(tenant.rent_pln)} | Kaucja: {format_pln(tenant.deposit_pln)}')
+        print(f'  Umowa: {tenant.date_agreement_from} – {tenant.date_agreement_to}')
+
+        tenant_transfers = [transfer for transfer in manager.transfers if transfer.tenant == tenant.name]
+        if tenant_transfers:
+            print('  Wpłaty:')
+            for transfer in tenant_transfers:
+                period = (
+                    f'{transfer.settlement_month:02d}/{transfer.settlement_year}'
+                    if transfer.settlement_month is not None and transfer.settlement_year is not None
+                    else 'brak okresu'
+                )
+                print(f'    • {format_pln(transfer.amount_pln)} | data: {transfer.date} | okres: {period}')
+        else:
+            print('  Wpłaty: brak')

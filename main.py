@@ -114,17 +114,32 @@ if __name__ == '__main__':
     parameters = Parameters()
     manager = Manager(parameters)
 
+    print("=" * 50)
+    print("APARTMENTS")
+    print("=" * 50)
+
     for apartment in manager.apartments.values():
-        print(apartment.key, apartment.name, apartment.location, apartment.area_m2)
+        print(f"\n[{apartment.key}] {apartment.name} — {apartment.location} ({apartment.area_m2:.0f} m2)")
+
+        print("  Rooms:")
         for room in apartment.rooms.values():
-            print('  ', room.name, room.area_m2)
-        
+            print(f"    - {room.name} ({room.area_m2:.0f} m2)")
+
+        print("  Bills:")
         for bill in manager.bills:
             if bill.apartment == apartment.key:
-                print('  ', bill.amount_pln, bill.date_due, bill.settlement_year, bill.settlement_month, bill.type)
+                print(f"    - {bill.type:<10} {bill.amount_pln:>8,.2f} zł  due {bill.date_due}  [{bill.settlement_year}-{bill.settlement_month:02d}]")
+
+    print("\n" + "=" * 50)
+    print("TENANTS")
+    print("=" * 50)
 
     for tenant in manager.tenants.values():
-        print(tenant.name, tenant.apartment, tenant.room, tenant.rent_pln, tenant.deposit_pln, tenant.date_agreement_from, tenant.date_agreement_to)
+        print(f"\n{tenant.name}  ->  {tenant.apartment} / {tenant.room}")
+        print(f"  Rent: {tenant.rent_pln:,.2f} zł   Deposit: {tenant.deposit_pln:,.2f} zł")
+        print(f"  Agreement: {tenant.date_agreement_from} -> {tenant.date_agreement_to}")
+
+        print("  Transfers:")
         for transfer in manager.transfers:
             if transfer.tenant == tenant.name:
-                print('  ', transfer.amount_pln, transfer.date, transfer.settlement_year, transfer.settlement_month)
+                print(f"    - {transfer.amount_pln:>8,.2f} zł  on {transfer.date}  [{transfer.settlement_year}-{transfer.settlement_month:02d}]")

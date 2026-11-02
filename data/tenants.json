@@ -1,7 +1,7 @@
 {
 	"tenant-1": {
 		"name": "tenant-1",
-		"apartment": "apart-polanka",
+		"apartment": "apartment-polanka",
 		"room": "room-large",
 		"rent_pln": 1500.0,
 		"deposit_pln": 3000.0,
@@ -10,7 +10,7 @@
 	},
 	"tenant-2": {
 		"name": "tenant-2",
-		"apartment": "apart-polanka",
+		"apartment": "apartment-polanka",
 		"room": "room-medium",
 		"rent_pln": 1200.0,
 		"deposit_pln": 2400.0,
@@ -19,7 +19,7 @@
 	},
 	"tenant-3": {
 		"name": "tenant-3",
-		"apartment": "apart-polanka",
+		"apartment": "apartment-polanka",
 		"room": "room-small",
 		"rent_pln": 1000.0,
 		"deposit_pln": 2000.0,
